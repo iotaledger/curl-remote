@@ -11,6 +11,8 @@ const monkeyPatchIOTA = (iotaInstance, endpoint, delay = 1000, apiKey) => {
     iotaInstance.sandboxKey = apiKey
     // Save Delay
     iotaInstance.sandboxDelay = delay
+    // Leave old call accessible
+    iotaInstance.api.oldAttachToTangle = iotaInstance.api.attachToTangle
     // Override the attachToTangle call
     iotaInstance.api.attachToTangle = async (
         trunk,
@@ -59,6 +61,7 @@ const monkeyPatchIOTA = (iotaInstance, endpoint, delay = 1000, apiKey) => {
 }
 // Call the Sandbox
 const sandboxATT = async (trunk, branch, mwm, trytes, sandbox, apiKey) => {
+    // Create Request Payload
     const payload = {
         command: 'attachToTangle',
         trunkTransaction: trunk,
@@ -66,6 +69,7 @@ const sandboxATT = async (trunk, branch, mwm, trytes, sandbox, apiKey) => {
         minWeightMagnitude: mwm,
         trytes: trytes
     }
+    // Create Request Object
     let params = {
         method: 'POST',
         headers: {
@@ -73,8 +77,9 @@ const sandboxATT = async (trunk, branch, mwm, trytes, sandbox, apiKey) => {
         },
         body: JSON.stringify(payload)
     }
+    // If API add auth
     if (apiKey) params.headers['Authorization'] = apiKey
-    console.log(params.headers)
+    // Post job to Sandbox
     const response = await fetch(`${sandbox}/api/v1/commands`, params)
     const data = await response.json()
     return data.jobId
