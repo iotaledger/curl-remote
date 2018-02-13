@@ -4,9 +4,11 @@ if (typeof window === 'undefined') {
 } else {
     fetch = window.fetch
 }
-const monkeyPatchIOTA = (iotaInstance, endpoint, delay = 1000) => {
+const monkeyPatchIOTA = (iotaInstance, endpoint, delay = 1000, apiKey) => {
     // Save Sandbox URL
     iotaInstance.sandboxUrl = endpoint
+    // Save API Key
+    iotaInstance.sandboxKey = apiKey
     // Save Delay
     iotaInstance.sandboxDelay = delay
     // Override the attachToTangle call
@@ -26,7 +28,8 @@ const monkeyPatchIOTA = (iotaInstance, endpoint, delay = 1000) => {
             branch,
             mwm,
             trytes,
-            iotaInstance.sandboxUrl
+            iotaInstance.sandboxUrl,
+            iotaInstance.sandboxKey
         )
         let jobCompletionTaskId
         let jobCompletionChecker = async () => {
@@ -55,7 +58,7 @@ const monkeyPatchIOTA = (iotaInstance, endpoint, delay = 1000) => {
     }
 }
 // Call the Sandbox
-const sandboxATT = async (trunk, branch, mwm, trytes, sandbox) => {
+const sandboxATT = async (trunk, branch, mwm, trytes, sandbox, apiKey) => {
     const payload = {
         command: 'attachToTangle',
         trunkTransaction: trunk,
@@ -63,13 +66,16 @@ const sandboxATT = async (trunk, branch, mwm, trytes, sandbox) => {
         minWeightMagnitude: mwm,
         trytes: trytes
     }
-    const response = await fetch(`${sandbox}/api/v1/commands`, {
+    let params = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
-    })
+    }
+    if (apiKey) params.headers['Authorization'] = apiKey
+    console.log(params.headers)
+    const response = await fetch(`${sandbox}/api/v1/commands`, params)
     const data = await response.json()
     return data.jobId
 }
