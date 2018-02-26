@@ -1,4 +1,4 @@
-# Powbox - IOTA.js Library Shim
+# Curl Remote - IOTA.js Library Shim
 
 This library is used to shim the [iota.lib.js](https://github.com/iotaledger/iota.lib.js) library to allow for it to be used with the Powbox. This enables for users to offload PoW from web user or small devices without capabilities.
 
@@ -10,10 +10,10 @@ The library exposes one function, which your require or import. This function is
 
 ```javascript
 // Import the Sanbox Monkey Patch for the IOTA lib
-const powboxPatch = require('powbox.patch.js')
+const remoteCurl = require('@iota/curl-remote')
 
 // Patch the current IOTA instance
-powboxPatch(iota, `https://powbox.testnet.iota.org`, 500, `sdkd...sdaa`)
+remoteCurl(iota, `https://powbox.testnet.iota.org`, 500, `sdkd...sdaa`)
 ```
 
 1. **iota**: `Object` The `iota.lib.js` instance in your application
